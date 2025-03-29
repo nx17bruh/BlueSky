@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --chart-1: 222.2 47.4% 11.2%;
+    --chart-2: 215 25% 27%;
+    --chart-3: 217 33% 17%;
+    --chart-4: 219 14% 51%;
+    --chart-5: 218 11% 65%;
+
+    /* 3D effect variables */
+    --shadow-color: 220 3% 15%;
+    --shadow-strength: 1%;
+    --shadow-3d: 0 1px 1px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%)), 0 3px 3px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 8%)), 0 5px 5px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 7%)), 0 10px 10px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 6%));
+
+    /* Weather-specific gradients */
+    --gradient-sunny: linear-gradient(135deg, #fcb045, #fd1d1d, #833ab4);
+    --gradient-cloudy: linear-gradient(135deg, #8e9eab, #eef2f3);
+    --gradient-rainy: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    --gradient-snowy: linear-gradient(135deg, #e6dada, #274046);
+
+    /* 3D box variables */
+    --box-bg: 210 40% 98%;
+    --box-shadow: 220 60% 50%;
+    --box-highlight: 210 40% 96%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+
+    --chart-1: 210 40% 98%;
+    --chart-2: 217 91% 60%;
+    --chart-3: 213 94% 68%;
+    --chart-4: 206 100% 70%;
+    --chart-5: 201 96% 68%;
+
+    /* Dark mode 3D effects */
+    --shadow-color: 220 40% 2%;
+    --shadow-strength: 25%;
+    --shadow-3d: 0 1px 1px hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%)), 0 3px 3px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 8%)), 0 5px 5px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 7%)), 0 10px 10px
+      hsl(var(--shadow-color) / calc(var(--shadow-strength) + 6%));
+
+    /* Dark mode box variables */
+    --box-bg: 222.2 84% 4.9%;
+    --box-shadow: 220 40% 2%;
+    --box-highlight: 217.2 32.6% 17.5%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground h-full;
+  }
+  html {
+    @apply h-full;
+  }
+}
+
+@layer components {
+  /* Custom 3D box styles */
+  .box-3d {
+    @apply relative rounded-xl overflow-hidden transition-all duration-300;
+    background-color: hsl(var(--box-bg));
+    box-shadow: var(--shadow-3d);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .box-3d:hover {
+    transform: translateY(-5px);
+  }
+
+  /* Weather condition gradients */
+  .gradient-sunny {
+    background: var(--gradient-sunny);
+  }
+
+  .gradient-cloudy {
+    background: var(--gradient-cloudy);
+  }
+
+  .gradient-rainy {
+    background: var(--gradient-rainy);
+  }
+
+  .gradient-snowy {
+    background: var(--gradient-snowy);
+  }
+
+  /* Glass effect for cards */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/30 dark:bg-gray-900/30 border border-white/20 dark:border-gray-800/20;
+  }
+}
+
+@layer utilities {
+  /* Animation for weather icons */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Responsive text sizes */
+  .text-responsive {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .title-responsive {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  /* 3D transform utilities */
+  .transform-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-5px) scale(1.02);
+  }
+}
+
