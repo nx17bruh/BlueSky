@@ -9,42 +9,106 @@ const GEO_URL = "https://api.openweathermap.org/geo/1.0"
 import type { WeatherData, ForecastData, LocationData } from "@/lib/weather-types"
 
 export async function fetchCurrentWeather(lat: number, lon: number, units = "metric"): Promise<WeatherData> {
-  const response = await fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`)
+  console.log(`Fetching current weather for lat: ${lat}, lon: ${lon}, units: ${units}`)
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch weather data")
+  try {
+    const response = await fetch(`${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Weather API error (${response.status}): ${errorText}`)
+      throw new Error(`Failed to fetch weather data: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching current weather:", error)
+    throw new Error("Failed to fetch weather data. Please try again.")
   }
-
-  return response.json()
 }
 
 export async function fetchForecast(lat: number, lon: number, units = "metric"): Promise<ForecastData> {
-  const response = await fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`)
+  console.log(`Fetching forecast for lat: ${lat}, lon: ${lon}, units: ${units}`)
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch forecast data")
+  try {
+    const response = await fetch(`${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Forecast API error (${response.status}): ${errorText}`)
+      throw new Error(`Failed to fetch forecast data: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error("Error fetching forecast:", error)
+    throw new Error("Failed to fetch forecast data. Please try again.")
   }
-
-  return response.json()
 }
 
 export async function fetchLocations(query: string): Promise<LocationData[]> {
-  const response = await fetch(`${GEO_URL}/direct?q=${query}&limit=5&appid=${API_KEY}`)
+  console.log(`Searching locations for query: ${query}`)
 
-  if (!response.ok) {
-    throw new Error("Failed to search locations")
+  try {
+    const response = await fetch(`${GEO_URL}/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Locations API error (${response.status}): ${errorText}`)
+      throw new Error(`Failed to search locations: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error("Error searching locations:", error)
+    throw new Error("Failed to search locations. Please try again.")
   }
-
-  return response.json()
 }
 
 export async function fetchLocationByCoords(lat: number, lon: number): Promise<LocationData[]> {
-  const response = await fetch(`${GEO_URL}/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`)
+  console.log(`Fetching location for lat: ${lat}, lon: ${lon}`)
 
-  if (!response.ok) {
-    throw new Error("Failed to get location")
+  try {
+    const response = await fetch(`${GEO_URL}/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`Reverse geocoding API error (${response.status}): ${errorText}`)
+      throw new Error(`Failed to get location: ${response.status} ${response.statusText}`)
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error("Error getting location by coords:", error)
+    throw new Error("Failed to get location. Please try again.")
   }
-
-  return response.json()
 }
 
