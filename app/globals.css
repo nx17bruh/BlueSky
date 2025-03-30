@@ -201,3 +201,33 @@
   }
 }
 
+/* Add this to your existing globals.css file */
+.leaflet-container {
+  background-color: #f8f9fa !important;
+}
+
+/* Make sure map controls are visible in dark mode */
+.dark .leaflet-control {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: #000 !important;
+}
+
+.dark .leaflet-control a {
+  color: #000 !important;
+}
+
+.dark .leaflet-control-zoom a {
+  color: #000 !important;
+}
+
+.dark .leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  color: #000 !important;
+}
+
+.dark .leaflet-control-attribution a {
+  color: #0078a8 !important;
+}
+
+
+
