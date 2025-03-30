@@ -12,7 +12,7 @@ Welcome to BlueSky, weather website that provides real-time weather updates with
 
 🚀 **Live Demo**
 
-Check out the live website: Blue Sky
+Check out the live website: [BlueSky](mailto:https://blue-sky-7j5v.vercel.app/)
 
 🛠️ **Technologies Used**
 
@@ -60,7 +60,7 @@ This project is licensed under the MIT License.
 
 📧 Contact
 
-For any inquiries, reach out at [your-email@example.com] or connect via GitHub Issues.
+For any inquiries, reach out at  [Mail](mailto:nx17bruh@gmail.com) or connect via GitHub Issues.
 
 Developed with ❤️ by nx17bruh
 
