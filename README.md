@@ -13,7 +13,7 @@ Welcome to BlueSky, weather website that provides real-time weather updates with
 
 🚀 **Live Demo**
 
-Check out the live website: [Blue Sky](https://blue-sky-7j5v.vercel.app/)
+Check out the live website: [BlueSky](https://blue-sky-7j5v.vercel.app/)
 
 
 🛠️ **Technologies Used**
