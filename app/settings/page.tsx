@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Bell, User, Moon, Sun, Monitor, SettingsIcon, UserCircle } from "lucide-react"
+import { Bell, Moon, Sun, Monitor, SettingsIcon, UserCircle } from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -14,35 +14,32 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useColorContext } from "@/components/theme-provider"
 import { Logo } from "@/components/logo"
-import { ColorPickerDropdown } from "@/components/color-picker-dropdown"
 import { Modern3DBox } from "@/components/modern-3d-box"
+import { UserProfile } from "@/components/user-profile"
+import { useUser } from "@/components/user-context"
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const { headerColor, setHeaderColor } = useColorContext()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const { isLoggedIn, user, updateProfile } = useUser()
   const [name, setName] = useState("")
+  const [profileImageUrl, setProfileImageUrl] = useState("")
   const [mounted, setMounted] = useState(false)
 
   // Ensure we only render theme components on the client to avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
-  }, [])
+    if (user) {
+      setName(user.name)
+      setProfileImageUrl(user.profileImage || "")
+    }
+  }, [user])
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Simulate login
-    setIsLoggedIn(true)
-    setName("John Doe")
-  }
-
-  const handleLogout = () => {
-    setIsLoggedIn(false)
-    setEmail("")
-    setPassword("")
-    setName("")
+  const handleUpdateProfile = () => {
+    updateProfile({
+      name,
+      profileImage: profileImageUrl || user?.profileImage,
+    })
   }
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,8 +63,7 @@ export default function SettingsPage() {
           <div className="flex items-center gap-2 md:gap-4">
             <ThemeToggle />
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <ColorPickerDropdown />
+            <UserProfile />
           </div>
         </div>
 
@@ -83,12 +79,20 @@ export default function SettingsPage() {
                 {isLoggedIn ? (
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-2xl font-bold text-white">
-                        {name.charAt(0)}
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-2xl font-bold text-white">
+                        {user?.profileImage ? (
+                          <img
+                            src={user.profileImage || "/placeholder.svg"}
+                            alt={user.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          user?.name.charAt(0)
+                        )}
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium">{name}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{email}</p>
+                        <h3 className="text-lg font-medium">{user?.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
                       </div>
                     </div>
 
@@ -99,41 +103,43 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                        <Label htmlFor="profile-image">Profile Image URL</Label>
+                        <Input
+                          id="profile-image"
+                          type="url"
+                          value={profileImageUrl}
+                          onChange={(e) => setProfileImageUrl(e.target.value)}
+                          placeholder="https://example.com/image.jpg"
+                        />
                       </div>
+
+                      {profileImageUrl && (
+                        <div className="flex justify-center">
+                          <div className="h-24 w-24 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <img
+                              src={profileImageUrl || "/placeholder.svg"}
+                              alt="Preview"
+                              className="h-full w-full object-cover"
+                              onError={(e) => {
+                                ;(e.target as HTMLImageElement).src = "https://via.placeholder.com/150"
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <Button onClick={handleLogout} variant="destructive">
-                      Log Out
-                    </Button>
+                    <Button onClick={handleUpdateProfile}>Update Profile</Button>
                   </div>
                 ) : (
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <Button type="submit">Log In</Button>
-                  </form>
+                  <div className="text-center py-8">
+                    <UserCircle className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Not Logged In</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-4">Log in to access your account settings</p>
+                    <Button onClick={() => document.querySelector("[data-user-profile-trigger]")?.click()}>
+                      Log In
+                    </Button>
+                  </div>
                 )}
               </Modern3DBox>
             </TabsContent>
@@ -220,4 +226,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
 
