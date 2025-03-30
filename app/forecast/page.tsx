@@ -43,16 +43,19 @@ export default function ForecastPage() {
     setError(null)
 
     try {
+      console.log(`Fetching weather data for lat: ${lat}, lon: ${lon}, units: ${units}`)
+
       const [weather, forecastData] = await Promise.all([
         getCurrentWeather(lat, lon, units),
         getForecast(lat, lon, units),
       ])
 
+      console.log("Weather data fetched successfully")
       setCurrentWeather(weather)
       setForecast(forecastData)
     } catch (error) {
-      setError("Failed to fetch weather data. Please try again.")
       console.error("Error fetching weather data:", error)
+      setError("Failed to fetch weather data. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -262,4 +265,6 @@ export default function ForecastPage() {
     </div>
   )
 }
+
+
 
