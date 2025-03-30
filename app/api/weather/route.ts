@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { fetchCurrentWeather, fetchForecast, fetchLocations, fetchLocationByCoords } from "@/lib/weather-actions"
+
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY
+const BASE_URL = "https://api.openweathermap.org/data/2.5"
+const GEO_URL = "https://api.openweathermap.org/geo/1.0"
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
@@ -10,37 +13,59 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    let result
+    let url = ""
 
     if (endpoint === "weather") {
-      const lat = Number.parseFloat(searchParams.get("lat") || "0")
-      const lon = Number.parseFloat(searchParams.get("lon") || "0")
+      const lat = searchParams.get("lat")
+      const lon = searchParams.get("lon")
       const units = searchParams.get("units") || "metric"
 
-      result = await fetchCurrentWeather(lat, lon, units)
+      url = `${BASE_URL}/weather?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`
     } else if (endpoint === "forecast") {
-      const lat = Number.parseFloat(searchParams.get("lat") || "0")
-      const lon = Number.parseFloat(searchParams.get("lon") || "0")
+      const lat = searchParams.get("lat")
+      const lon = searchParams.get("lon")
       const units = searchParams.get("units") || "metric"
 
-      result = await fetchForecast(lat, lon, units)
+      url = `${BASE_URL}/forecast?lat=${lat}&lon=${lon}&units=${units}&appid=${API_KEY}`
     } else if (endpoint === "direct") {
-      const query = searchParams.get("q") || ""
+      const query = searchParams.get("q")
 
-      result = await fetchLocations(query)
+      url = `${GEO_URL}/direct?q=${encodeURIComponent(query || "")}&limit=5&appid=${API_KEY}`
     } else if (endpoint === "reverse") {
-      const lat = Number.parseFloat(searchParams.get("lat") || "0")
-      const lon = Number.parseFloat(searchParams.get("lon") || "0")
+      const lat = searchParams.get("lat")
+      const lon = searchParams.get("lon")
 
-      result = await fetchLocationByCoords(lat, lon)
+      url = `${GEO_URL}/reverse?lat=${lat}&lon=${lon}&limit=1&appid=${API_KEY}`
     } else {
       return NextResponse.json({ error: "Invalid endpoint" }, { status: 400 })
     }
 
-    return NextResponse.json(result)
+    console.log(`Fetching from: ${url.replace(API_KEY || "", "API_KEY")}`)
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`API error (${response.status}): ${errorText}`)
+      return NextResponse.json(
+        { error: `Failed to fetch data: ${response.status} ${response.statusText}` },
+        { status: response.status },
+      )
+    }
+
+    const data = await response.json()
+    return NextResponse.json(data)
   } catch (error) {
-    console.error("Error fetching weather data:", error)
-    return NextResponse.json({ error: "Failed to fetch weather data" }, { status: 500 })
+    console.error("Error in weather API route:", error)
+    return NextResponse.json({ error: "Failed to fetch data. Please try again." }, { status: 500 })
   }
 }
+
+
 
