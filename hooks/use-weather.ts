@@ -39,10 +39,14 @@ export function useWeather() {
       setState((prev) => ({ ...prev, isLoading: true, error: null }))
 
       try {
+        console.log(`Fetching weather data for lat: ${lat}, lon: ${lon}, units: ${state.units}`)
+
         const [weather, forecast] = await Promise.all([
           getCurrentWeather(lat, lon, state.units),
           getForecast(lat, lon, state.units),
         ])
+
+        console.log("Weather data fetched successfully")
 
         setState((prev) => ({
           ...prev,
@@ -51,12 +55,12 @@ export function useWeather() {
           isLoading: false,
         }))
       } catch (error) {
+        console.error("Error fetching weather data:", error)
         setState((prev) => ({
           ...prev,
           error: "Failed to fetch weather data. Please try again.",
           isLoading: false,
         }))
-        console.error("Error fetching weather data:", error)
       }
     },
     [state.units],
@@ -85,6 +89,7 @@ export function useWeather() {
     setSearchLoading(true)
 
     try {
+      console.log(`Searching locations for query: ${query}`)
       const results = await searchLocations(query)
       setSearchResults(results)
     } catch (error) {
@@ -112,6 +117,8 @@ export function useWeather() {
       })
 
       const { latitude, longitude } = position.coords
+      console.log(`Got user location: lat: ${latitude}, lon: ${longitude}`)
+
       const locations = await getLocationByCoords(latitude, longitude)
 
       if (locations.length > 0) {
@@ -119,12 +126,12 @@ export function useWeather() {
         await fetchWeatherData(latitude, longitude)
       }
     } catch (error) {
+      console.error("Error getting user location:", error)
       setState((prev) => ({
         ...prev,
         error: "Failed to get your location. Please search manually.",
         isLoading: false,
       }))
-      console.error("Error getting user location:", error)
     }
   }, [fetchWeatherData])
 
@@ -166,4 +173,6 @@ export function useWeather() {
     toggleUnits,
   }
 }
+
+
 
