@@ -1,17 +1,17 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { Bell, User } from "lucide-react"
+import { Bell } from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import { useState } from "react"
 import { searchLocations, type LocationData } from "@/lib/weather-service"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Logo } from "@/components/logo"
-import { ColorPickerDropdown } from "@/components/color-picker-dropdown"
 import { ModernSearchBox } from "@/components/modern-search-box"
 import { CityCard } from "@/components/city-card"
 import { motion } from "framer-motion"
+import { UserProfile } from "@/components/user-profile"
 
 export default function HomePage() {
   const router = useRouter()
@@ -61,8 +61,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2 md:gap-4">
             <ThemeToggle />
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <ColorPickerDropdown />
+            <UserProfile />
           </div>
         </div>
 
@@ -113,4 +112,6 @@ export default function HomePage() {
     </div>
   )
 }
+
+
 
