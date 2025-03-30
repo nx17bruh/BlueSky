@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Bell, User, MapPin, Loader2, RefreshCw, Wind, Droplets, Sunrise, Sunset, Calendar, Map } from "lucide-react"
+import { Bell, MapPin, Loader2, RefreshCw, Wind, Droplets, Sunrise, Sunset, Calendar, Map } from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import WeatherCard from "@/components/weather-card"
@@ -16,6 +16,7 @@ import { ColorPickerDropdown } from "@/components/color-picker-dropdown"
 import { Modern3DBox } from "@/components/modern-3d-box"
 import Forecast from "@/components/forecast"
 import ChanceOfRain from "@/components/chance-of-rain"
+import { UserProfile } from "@/components/user-profile"
 
 export default function ForecastPage() {
   const searchParams = useSearchParams()
@@ -140,8 +141,7 @@ export default function ForecastPage() {
 
             <ThemeToggle />
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <ColorPickerDropdown />
+            <UserProfile />
           </div>
         </div>
 
@@ -169,6 +169,8 @@ export default function ForecastPage() {
             <Calendar className="w-4 h-4" />
             Add to Calendar
           </Button>
+
+          <ColorPickerDropdown />
         </div>
 
         {isLoading ? (
@@ -265,6 +267,8 @@ export default function ForecastPage() {
     </div>
   )
 }
+
+
 
 
 
