@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bell, User, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react"
+import { Bell, ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Logo } from "@/components/logo"
 import { ColorPickerDropdown } from "@/components/color-picker-dropdown"
 import { Modern3DBox } from "@/components/modern-3d-box"
+import { UserProfile } from "@/components/user-profile"
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -91,8 +92,7 @@ export default function CalendarPage() {
           <div className="flex items-center gap-2 md:gap-4">
             <ThemeToggle />
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            <ColorPickerDropdown />
+            <UserProfile />
           </div>
         </div>
 
@@ -116,6 +116,7 @@ export default function CalendarPage() {
               <Button variant="outline" size="icon" onClick={nextMonth}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
+              <ColorPickerDropdown />
             </div>
           </div>
 
@@ -157,4 +158,6 @@ export default function CalendarPage() {
     </div>
   )
 }
+
+
 
