@@ -3,6 +3,7 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Inter, Montserrat } from "next/font/google"
 import { ThemeProvider, ColorProvider } from "@/components/theme-provider"
+import { UserProvider } from "@/components/user-context"
 import Script from "next/script"
 
 // Use Montserrat as a similar alternative to Modulus Pro
@@ -17,7 +18,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Weather Dashboard",
   description: "Real-time weather information",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -34,7 +34,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} ${montserrat.variable} h-full`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <ColorProvider>{children}</ColorProvider>
+          <ColorProvider>
+            <UserProvider>{children}</UserProvider>
+          </ColorProvider>
         </ThemeProvider>
 
         {/* Fallback script to ensure Leaflet loads */}
@@ -70,6 +72,3 @@ export default function RootLayout({
   )
 }
 
-
-
-import './globals.css'
