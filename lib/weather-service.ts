@@ -8,19 +8,100 @@ import { fetchCurrentWeather, fetchForecast, fetchLocations, fetchLocationByCoor
 export type { WeatherData, ForecastData, LocationData }
 
 export async function getCurrentWeather(lat: number, lon: number, units = "metric"): Promise<WeatherData> {
-  return fetchCurrentWeather(lat, lon, units)
+  try {
+    // First try using server action
+    return await fetchCurrentWeather(lat, lon, units)
+  } catch (error) {
+    console.log("Server action failed, falling back to API route:", error)
+
+    // Fallback to API route
+    const params = new URLSearchParams({
+      endpoint: "weather",
+      lat: lat.toString(),
+      lon: lon.toString(),
+      units: units,
+    })
+
+    const response = await fetch(`/api/weather?${params.toString()}`)
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch weather data")
+    }
+
+    return response.json()
+  }
 }
 
 export async function getForecast(lat: number, lon: number, units = "metric"): Promise<ForecastData> {
-  return fetchForecast(lat, lon, units)
+  try {
+    // First try using server action
+    return await fetchForecast(lat, lon, units)
+  } catch (error) {
+    console.log("Server action failed, falling back to API route:", error)
+
+    // Fallback to API route
+    const params = new URLSearchParams({
+      endpoint: "forecast",
+      lat: lat.toString(),
+      lon: lon.toString(),
+      units: units,
+    })
+
+    const response = await fetch(`/api/weather?${params.toString()}`)
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch forecast data")
+    }
+
+    return response.json()
+  }
 }
 
 export async function searchLocations(query: string): Promise<LocationData[]> {
-  return fetchLocations(query)
+  try {
+    // First try using server action
+    return await fetchLocations(query)
+  } catch (error) {
+    console.log("Server action failed, falling back to API route:", error)
+
+    // Fallback to API route
+    const params = new URLSearchParams({
+      endpoint: "direct",
+      q: query,
+    })
+
+    const response = await fetch(`/api/weather?${params.toString()}`)
+
+    if (!response.ok) {
+      throw new Error("Failed to search locations")
+    }
+
+    return response.json()
+  }
 }
 
 export async function getLocationByCoords(lat: number, lon: number): Promise<LocationData[]> {
-  return fetchLocationByCoords(lat, lon)
+  try {
+    // First try using server action
+    return await fetchLocationByCoords(lat, lon)
+  } catch (error) {
+    console.log("Server action failed, falling back to API route:", error)
+
+    // Fallback to API route
+    const params = new URLSearchParams({
+      endpoint: "reverse",
+      lat: lat.toString(),
+      lon: lon.toString(),
+    })
+
+    const response = await fetch(`/api/weather?${params.toString()}`)
+
+    if (!response.ok) {
+      throw new Error("Failed to get location")
+    }
+
+    return response.json()
+  }
 }
 
 export function getWeatherIcon(code: string): string {
@@ -129,4 +210,6 @@ export function getDailyForecast(forecast: ForecastData): {
       return { day, high, low, condition, icon, date: data.date }
     })
 }
+
+
 
