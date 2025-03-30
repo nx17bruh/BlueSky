@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 
-const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY
+const API_KEY = "20a7e53aedb50ad0125f8e9c3b25d234";
 const BASE_URL = "https://api.openweathermap.org/data/2.5"
 const GEO_URL = "https://api.openweathermap.org/geo/1.0"
 
