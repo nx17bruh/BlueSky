@@ -80,11 +80,8 @@ export default function MapComponent({ onLocationSelect }: MapComponentProps) {
 
       mapInstanceRef.current = map
 
-      // Set tile layer based on theme
-      const tileLayer =
-        theme === "dark"
-          ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      // Always use the light theme for the map
+      const tileLayer = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 
       window.L.tileLayer(tileLayer, {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -111,7 +108,7 @@ export default function MapComponent({ onLocationSelect }: MapComponentProps) {
       setError("Failed to initialize map. Please refresh the page.")
       setIsLoading(false)
     }
-  }, [theme, onLocationSelect])
+  }, [onLocationSelect])
 
   // Load Leaflet and initialize map
   useEffect(() => {
@@ -158,30 +155,8 @@ export default function MapComponent({ onLocationSelect }: MapComponentProps) {
     }
   }, [loadLeaflet, initializeMap])
 
-  // Update tile layer when theme changes
-  useEffect(() => {
-    if (!isMapInitialized || !mapInstanceRef.current || !window.L) return
-
-    const map = mapInstanceRef.current
-
-    // Remove existing tile layers
-    map.eachLayer((layer: any) => {
-      if (layer instanceof window.L.TileLayer) {
-        map.removeLayer(layer)
-      }
-    })
-
-    // Add new tile layer based on theme
-    const tileLayer =
-      theme === "dark"
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-
-    window.L.tileLayer(tileLayer, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      noWrap: true,
-    }).addTo(map)
-  }, [theme, isMapInitialized])
+  // We don't need to update the tile layer when theme changes anymore
+  // since we're always using the light theme for the map
 
   // Handle window resize
   useEffect(() => {
