@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { Bell, Moon, Sun, Monitor, SettingsIcon, UserCircle } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import { Bell, Moon, Sun, Monitor, SettingsIcon, UserCircle, Upload } from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -23,27 +23,60 @@ export default function SettingsPage() {
   const { headerColor, setHeaderColor } = useColorContext()
   const { isLoggedIn, user, updateProfile } = useUser()
   const [name, setName] = useState("")
-  const [profileImageUrl, setProfileImageUrl] = useState("")
   const [mounted, setMounted] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Ensure we only render theme components on the client to avoid hydration mismatch
   useEffect(() => {
     setMounted(true)
     if (user) {
       setName(user.name)
-      setProfileImageUrl(user.profileImage || "")
     }
   }, [user])
 
   const handleUpdateProfile = () => {
     updateProfile({
       name,
-      profileImage: profileImageUrl || user?.profileImage,
     })
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          updateProfile({ profileImage: event.target.result as string })
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click()
   }
 
   const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setHeaderColor(e.target.value)
+  }
+
+  // Function to open the login dialog from the UserProfile component
+  const openLoginDialog = () => {
+    // Find and click the user profile trigger button
+    const triggerButton = document.querySelector("[data-user-profile-trigger]") as HTMLButtonElement
+    if (triggerButton) {
+      triggerButton.click()
+
+      // Small delay to ensure the dropdown opens first
+      setTimeout(() => {
+        // Find and click the login menu item
+        const loginMenuItem = document.querySelector("[data-login-menu-item]") as HTMLButtonElement
+        if (loginMenuItem) {
+          loginMenuItem.click()
+        }
+      }, 100)
+    }
   }
 
   if (!mounted) {
@@ -79,7 +112,10 @@ export default function SettingsPage() {
                 {isLoggedIn ? (
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-2xl font-bold text-white">
+                      <div
+                        className="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-2xl font-bold text-white cursor-pointer relative"
+                        onClick={triggerFileInput}
+                      >
                         {user?.profileImage ? (
                           <img
                             src={user.profileImage || "/placeholder.svg"}
@@ -89,7 +125,17 @@ export default function SettingsPage() {
                         ) : (
                           user?.name.charAt(0)
                         )}
+                        <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <Upload className="w-6 h-6 text-white" />
+                        </div>
                       </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                      />
                       <div>
                         <h3 className="text-lg font-medium">{user?.name}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
@@ -101,32 +147,6 @@ export default function SettingsPage() {
                         <Label htmlFor="display-name">Display Name</Label>
                         <Input id="display-name" value={name} onChange={(e) => setName(e.target.value)} />
                       </div>
-
-                      <div className="grid gap-2">
-                        <Label htmlFor="profile-image">Profile Image URL</Label>
-                        <Input
-                          id="profile-image"
-                          type="url"
-                          value={profileImageUrl}
-                          onChange={(e) => setProfileImageUrl(e.target.value)}
-                          placeholder="https://example.com/image.jpg"
-                        />
-                      </div>
-
-                      {profileImageUrl && (
-                        <div className="flex justify-center">
-                          <div className="h-24 w-24 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
-                            <img
-                              src={profileImageUrl || "/placeholder.svg"}
-                              alt="Preview"
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                ;(e.target as HTMLImageElement).src = "https://via.placeholder.com/150"
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
 
                     <Button onClick={handleUpdateProfile}>Update Profile</Button>
@@ -136,9 +156,7 @@ export default function SettingsPage() {
                     <UserCircle className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                     <h3 className="text-lg font-medium mb-2">Not Logged In</h3>
                     <p className="text-gray-500 dark:text-gray-400 mb-4">Log in to access your account settings</p>
-                    <Button onClick={() => document.querySelector("[data-user-profile-trigger]")?.click()}>
-                      Log In
-                    </Button>
+                    <Button onClick={openLoginDialog}>Log In</Button>
                   </div>
                 )}
               </Modern3DBox>
@@ -226,5 +244,7 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+
 
 
