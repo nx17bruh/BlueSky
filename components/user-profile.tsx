@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { User, LogOut, Upload, UserCircle } from "lucide-react"
 import { useUser } from "./user-context"
 import {
@@ -30,8 +30,7 @@ export function UserProfile() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [profileImageUrl, setProfileImageUrl] = useState("")
-  const [imageDialogOpen, setImageDialogOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,12 +40,21 @@ export function UserProfile() {
     setPassword("")
   }
 
-  const handleUpdateProfileImage = () => {
-    if (profileImageUrl) {
-      updateProfile({ profileImage: profileImageUrl })
-      setProfileImageUrl("")
-      setImageDialogOpen(false)
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          updateProfile({ profileImage: event.target.result as string })
+        }
+      }
+      reader.readAsDataURL(file)
     }
+  }
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click()
   }
 
   return (
@@ -78,9 +86,10 @@ export function UserProfile() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setImageDialogOpen(true)}>
+              <DropdownMenuItem onClick={triggerFileInput}>
                 <Upload className="mr-2 h-4 w-4" />
                 <span>Change Profile Photo</span>
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
               </DropdownMenuItem>
               <DropdownMenuItem onClick={logout}>
                 <LogOut className="mr-2 h-4 w-4" />
@@ -91,7 +100,7 @@ export function UserProfile() {
             <>
               <DropdownMenuLabel>Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setLoginOpen(true)}>
+              <DropdownMenuItem onClick={() => setLoginOpen(true)} data-login-menu-item>
                 <UserCircle className="mr-2 h-4 w-4" />
                 <span>Log In</span>
               </DropdownMenuItem>
@@ -138,48 +147,8 @@ export function UserProfile() {
           </form>
         </DialogContent>
       </Dialog>
-
-      {/* Profile Image Dialog */}
-      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Update Profile Photo</DialogTitle>
-            <DialogDescription>Enter a URL for your profile image.</DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="profileImage">Image URL</Label>
-              <Input
-                id="profileImage"
-                type="url"
-                value={profileImageUrl}
-                onChange={(e) => setProfileImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            {profileImageUrl && (
-              <div className="flex justify-center">
-                <div className="h-24 w-24 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
-                  <img
-                    src={profileImageUrl || "/placeholder.svg"}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      ;(e.target as HTMLImageElement).src = "https://via.placeholder.com/150"
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            <Button onClick={handleUpdateProfileImage} disabled={!profileImageUrl}>
-              Update Photo
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }
+
 
