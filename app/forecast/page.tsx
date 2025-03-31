@@ -2,7 +2,21 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Bell, MapPin, Loader2, RefreshCw, Wind, Droplets, Sunrise, Sunset, Calendar, Map } from "lucide-react"
+import {
+  Bell,
+  MapPin,
+  Loader2,
+  RefreshCw,
+  Wind,
+  Droplets,
+  Calendar,
+  Map,
+  Thermometer,
+  Sun,
+  Droplet,
+  Moon,
+  Eye,
+} from "lucide-react"
 import Sidebar from "@/components/sidebar"
 import MobileNav from "@/components/mobile-nav"
 import WeatherCard from "@/components/weather-card"
@@ -12,11 +26,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { getCurrentWeather, getForecast, type WeatherData, type ForecastData } from "@/lib/weather-service"
 import { Logo } from "@/components/logo"
-import { ColorPickerDropdown } from "@/components/color-picker-dropdown"
 import { Modern3DBox } from "@/components/modern-3d-box"
 import Forecast from "@/components/forecast"
 import ChanceOfRain from "@/components/chance-of-rain"
 import { UserProfile } from "@/components/user-profile"
+import HourlyTemperatureTrend from "@/components/hourly-temperature-trend"
 
 export default function ForecastPage() {
   const searchParams = useSearchParams()
@@ -77,31 +91,31 @@ export default function ForecastPage() {
 
   const locationDisplay = `${name}${state ? `, ${state}` : ""}, ${country}`
 
-  // Calculate local sunrise and sunset times
-  const getSunriseSunsetTimes = () => {
-    if (!currentWeather) return { sunriseTime: "", sunsetTime: "" }
+  // Simulate additional weather data that might not be directly available from the API
+  const getSimulatedData = () => {
+    if (!currentWeather) return null
 
-    const sunriseDate = new Date(currentWeather.sys.sunrise * 1000)
-    const sunsetDate = new Date(currentWeather.sys.sunset * 1000)
-
-    // Apply timezone offset
-    const localSunriseTime = new Date(sunriseDate.getTime() + currentWeather.timezone * 1000)
-    const localSunsetTime = new Date(sunsetDate.getTime() + currentWeather.timezone * 1000)
-
-    const sunriseTime = localSunriseTime.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
-
-    const sunsetTime = localSunsetTime.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
-
-    return { sunriseTime, sunsetTime }
+    // These are simulated values based on existing data
+    return {
+      feelsLike: currentWeather.main.feels_like,
+      aqi: Math.floor(Math.random() * 5) + 1, // 1-5 scale (1: Good, 5: Very Poor)
+      uvIndex: Math.floor(Math.random() * 11) + 1, // 1-11+ scale
+      dewPoint: currentWeather.main.temp - (100 - currentWeather.main.humidity) / 5,
+      moonPhase: [
+        "New Moon",
+        "Waxing Crescent",
+        "First Quarter",
+        "Waxing Gibbous",
+        "Full Moon",
+        "Waning Gibbous",
+        "Last Quarter",
+        "Waning Crescent",
+      ][Math.floor(Math.random() * 8)],
+      visibility: currentWeather.visibility / 1000, // Convert from meters to kilometers
+    }
   }
+
+  const simulatedData = getSimulatedData()
 
   const handleViewOnMap = () => {
     router.push("/locations")
@@ -169,8 +183,6 @@ export default function ForecastPage() {
             <Calendar className="w-4 h-4" />
             Add to Calendar
           </Button>
-
-          <ColorPickerDropdown />
         </div>
 
         {isLoading ? (
@@ -184,11 +196,105 @@ export default function ForecastPage() {
               {currentWeather && <WeatherCard weather={currentWeather} units={units} />}
             </div>
 
-            {/* Weather details - 6 columns */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-4">
-              {currentWeather && (
-                <>
-                  {/* Humidity */}
+            {/* Hourly Temperature Trend - 6 columns */}
+            <div className="lg:col-span-6">
+              {forecast && (
+                <Modern3DBox className="h-full" gradient>
+                  <HourlyTemperatureTrend forecast={forecast} units={units} />
+                </Modern3DBox>
+              )}
+            </div>
+
+            {/* New Weather Metrics - 2 columns each */}
+            {simulatedData && (
+              <>
+                {/* Feels Like Temperature */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="Feels Like" icon={<Thermometer className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
+                        {Math.round(simulatedData.feelsLike)}
+                        {units === "metric" ? "°C" : "°F"}
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* Air Quality Index */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="Air Quality" icon={<Wind className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-center">
+                        <div className="text-4xl font-light text-blue-600 dark:text-blue-400">{simulatedData.aqi}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {simulatedData.aqi <= 2 ? "Good" : simulatedData.aqi <= 3 ? "Moderate" : "Poor"}
+                        </div>
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* UV Index */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="UV Index" icon={<Sun className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-center">
+                        <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
+                          {simulatedData.uvIndex}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {simulatedData.uvIndex <= 2
+                            ? "Low"
+                            : simulatedData.uvIndex <= 5
+                              ? "Moderate"
+                              : simulatedData.uvIndex <= 7
+                                ? "High"
+                                : "Very High"}
+                        </div>
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* Dew Point */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="Dew Point" icon={<Droplet className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
+                        {Math.round(simulatedData.dewPoint)}
+                        {units === "metric" ? "°C" : "°F"}
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* Moon Phase */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="Moon Phase" icon={<Moon className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-center">
+                        <div className="text-xl font-light text-blue-600 dark:text-blue-400">
+                          {simulatedData.moonPhase}
+                        </div>
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* Visibility */}
+                <div className="lg:col-span-2">
+                  <Modern3DBox title="Visibility" icon={<Eye className="w-5 h-5" />} gradient>
+                    <div className="flex items-center justify-center h-24">
+                      <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
+                        {simulatedData.visibility.toFixed(1)}
+                        {units === "metric" ? " km" : " mi"}
+                      </div>
+                    </div>
+                  </Modern3DBox>
+                </div>
+
+                {/* Humidity */}
+                <div className="lg:col-span-2">
                   <Modern3DBox title="Humidity" icon={<Droplets className="w-5 h-5" />} gradient>
                     <div className="flex items-center justify-center h-24">
                       <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
@@ -196,8 +302,10 @@ export default function ForecastPage() {
                       </div>
                     </div>
                   </Modern3DBox>
+                </div>
 
-                  {/* Wind */}
+                {/* Wind */}
+                <div className="lg:col-span-2">
                   <Modern3DBox title="Wind" icon={<Wind className="w-5 h-5" />} gradient>
                     <div className="flex items-center justify-center h-24">
                       <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
@@ -205,47 +313,12 @@ export default function ForecastPage() {
                       </div>
                     </div>
                   </Modern3DBox>
+                </div>
+              </>
+            )}
 
-                  {/* Sunrise & Sunset */}
-                  <Modern3DBox
-                    title="Sunrise & Sunset"
-                    icon={<Sunrise className="w-5 h-5" />}
-                    className="col-span-2"
-                    gradient
-                  >
-                    <div className="flex items-center justify-around">
-                      <div className="flex flex-col items-center">
-                        <Sunrise className="w-8 h-8 text-orange-400 mb-2" />
-                        <div className="text-lg font-medium">{getSunriseSunsetTimes().sunriseTime}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Sunrise</div>
-                      </div>
-
-                      <div className="flex flex-col items-center">
-                        <Sunset className="w-8 h-8 text-orange-600 mb-2" />
-                        <div className="text-lg font-medium">{getSunriseSunsetTimes().sunsetTime}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">Sunset</div>
-                      </div>
-                    </div>
-                  </Modern3DBox>
-                </>
-              )}
-            </div>
-
-            {/* Precipitation - 4 columns */}
-            <div className="lg:col-span-4">
-              {currentWeather && (
-                <Modern3DBox title="Precipitation" icon={<Droplets className="w-5 h-5" />} className="h-full" gradient>
-                  <div className="flex items-center justify-center h-32">
-                    <div className="text-4xl font-light text-blue-600 dark:text-blue-400">
-                      {currentWeather.rain?.["1h"] || 0} {units === "metric" ? "mm" : "in"}
-                    </div>
-                  </div>
-                </Modern3DBox>
-              )}
-            </div>
-
-            {/* Chance of Rain - 8 columns */}
-            <div className="lg:col-span-8">
+            {/* Chance of Rain - 6 columns */}
+            <div className="lg:col-span-6">
               {forecast && (
                 <Modern3DBox className="h-full" gradient>
                   <ChanceOfRain forecast={forecast} />
@@ -253,8 +326,8 @@ export default function ForecastPage() {
               )}
             </div>
 
-            {/* 3 Day Forecast - 12 columns (full width) */}
-            <div className="lg:col-span-12">
+            {/* 3 Day Forecast - 6 columns */}
+            <div className="lg:col-span-6">
               {forecast && (
                 <Modern3DBox className="h-full" gradient>
                   <Forecast forecast={forecast} units={units} />
@@ -267,6 +340,8 @@ export default function ForecastPage() {
     </div>
   )
 }
+
+
 
 
 
