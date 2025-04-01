@@ -24,27 +24,25 @@ Check out the live website: [BlueSky](https://blue-sky-7j5v.vercel.app/)
 
 **Deployment:** Vercel
 
-📂 Installation & Setup
+🔧 Installation & Setup
 
-1. Clone the repository:
+1 Clone the repository:
 
-git clone https://github.com/your-username/blue-sky.git
+git clone https://github.com/your-username/weather-ai.git
 
-2. Navigate to the project folder:
+cd weather-ai
 
-cd blue-sky
-
-3. Install dependencies:
+2 Install dependencies:
 
 npm install
 
-4. Start the development server:
+3 Create a .env file and add your API key:
+
+REACT_APP_WEATHER_API_KEY=your_api_key_here
+
+4 Run the development server:
 
 npm run dev
-
-5. Open in browser at
-
-http://localhost:3000
 
 📝 Usage
 
